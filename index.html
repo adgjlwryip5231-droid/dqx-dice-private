@@ -45,6 +45,23 @@ button:not(:disabled):active{transform:translateY(1px)}
 input,select,textarea{border-radius:var(--control-radius);border-color:var(--control-border)}
 @media(max-width:600px){.slot-buttons{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.slot-button{font-size:13px}.quick-amount-button{font-size:13px}.profile-panel{padding:15px}.slot-status{font-size:11px}}
 
+
+/* Private chat: shared lobby for the ten player slots. */
+.chat-panel{margin:20px 0 0}
+.chat-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+.chat-header-sub{color:var(--muted);font-size:11px;margin:8px 0 0;line-height:1.7}
+.chat-messages{height:340px;overflow-y:auto;overscroll-behavior:contain;border:1px solid var(--border);border-radius:10px;background:#0b1424;padding:14px;display:flex;flex-direction:column;gap:12px}
+.chat-bubble{align-self:flex-start;max-width:min(85%,570px);padding:10px 12px;background:#182741;border:1px solid #344766;border-radius:11px;overflow-wrap:anywhere}
+.chat-bubble.mine{align-self:flex-end;background:#173849;border-color:#2f6e79}
+.chat-meta{font-size:11px;color:#b5cce8;margin-bottom:5px}
+.chat-body{font-size:13px;white-space:pre-wrap;line-height:1.6}
+.chat-compose{display:grid;grid-template-columns:1fr auto;align-items:end;gap:10px;margin-top:12px}
+.chat-compose textarea{min-height:48px;max-height:130px;resize:vertical}
+.chat-compose button{min-height:48px}
+.chat-feedback{min-height:18px;margin-top:8px;font-size:12px;color:var(--muted)}
+.chat-feedback.error{color:var(--red)}
+.chat-empty{text-align:center;font-size:12px;color:var(--muted);margin:auto}
+@media(max-width:600px){.chat-messages{height:300px;padding:10px}.chat-compose{grid-template-columns:1fr}.chat-compose button{width:100%}}
 </style>
   <script src="config.js"></script>
   
@@ -124,6 +141,19 @@ window.addEventListener('unhandledrejection', function(event) {
           <section class="panel"><div class="panel-top"><div><span class="eyebrow">INFORMATION</span><h2>プライバシー</h2></div></div><div class="info-copy"><p>1つのログインで10人分の収支を切り替えられます。</p><p>各人の収支は別々に集計します。ログインしていない人は見られません。</p><p>結果は自動で30秒ごとに再取得します。</p></div><button id="shareBtn" class="outline-button" type="button">URLをコピー</button></section>
         </aside>
       </section>
+
+      <section id="chatPanel" class="panel chat-panel hidden" aria-labelledby="chatTitle">
+        <div class="chat-top">
+          <div><span class="eyebrow">PRIVATE CHAT</span><h2 id="chatTitle">メンバーチャット</h2><p class="chat-header-sub">ログイン中の全員で共有します。送信者名は選択中のプレイヤー名です。</p></div>
+          <button id="chatRefresh" type="button" class="subtle-button">更新</button>
+        </div>
+        <div id="chatMessages" class="chat-messages" role="log" aria-live="polite" aria-relevant="additions"><p class="chat-empty">メッセージを取得しています。</p></div>
+        <form id="chatForm" class="chat-compose">
+          <label class="field"><span id="chatSender">送信者：プレイヤー1</span><textarea id="chatText" maxlength="500" rows="2" placeholder="メッセージを入力（最大500文字）" required></textarea></label>
+          <button id="chatSend" type="submit" class="primary-button">送信</button>
+        </form>
+        <p id="chatFeedback" class="chat-feedback" role="status" aria-live="polite"></p>
+      </section>
       <footer>DQX Dice Ledger · 非公式ファン制作ツール · ゲーム内の外部サイトではありません</footer>
     </main>
   </div>
@@ -144,6 +174,10 @@ let refreshing = false;
 let refreshTimer = null;
 let slotLoadError = '';
 let slotsReady = false;
+let chatLoading = false;
+let chatLastId = null;
+let chatTimer = null;
+let chatRows = [];
 const formatter = new Intl.NumberFormat('ja-JP');
 const money = (n) => formatter.format(n);
 const STORAGE_KEY = 'dqx_dice_session_v1';
@@ -262,6 +296,7 @@ function updateSlotUI() {
     message.classList.toggle('slot-error', Boolean(slotLoadError));
   }
   $('slotName').value = slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`;
+  updateChatSender();
 }
 async function loadSlots() {
   if (!isAdmin) { slots = []; slotsReady = false; slotLoadError = ''; updateSlotUI(); return; }
@@ -285,6 +320,7 @@ async function loadSlots() {
 }
 function updateAuthUI() {
   $('entryPanel').classList.toggle('hidden', !isAdmin);
+  $('chatPanel').classList.toggle('hidden', !isAdmin);
   $('viewerLabel').textContent = isAdmin ? `${session.user.email || 'ユーザー'}でログイン中` : 'ログインが必要';
   $('authBtn').textContent = session ? 'ログアウト' : 'ユーザーログイン';
   updateSlotUI();
@@ -407,6 +443,89 @@ function render() {
   }
   root.append(fragment);
 }
+
+function getActiveName() {
+  return slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`;
+}
+function updateChatSender() {
+  const label = $('chatSender');
+  if (label) label.textContent = `送信者：${getActiveName()}`;
+}
+function chatFeedback(message, error = false) {
+  const box = $('chatFeedback');
+  box.textContent = message;
+  box.classList.toggle('error', error);
+}
+function renderChat(rows) {
+  const root = $('chatMessages');
+  const nearBottom = root.scrollHeight - root.scrollTop - root.clientHeight < 100;
+  root.replaceChildren();
+  if (!rows.length) {
+    const info = document.createElement('p');
+    info.className = 'chat-empty';
+    info.textContent = 'まだメッセージはありません。';
+    root.append(info);
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  for (const item of rows) {
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble${Number(item.sender_slot) === selectedSlot ? ' mine' : ''}`;
+    const meta = document.createElement('div');
+    meta.className = 'chat-meta';
+    const dt = new Date(item.created_at);
+    const stamp = Number.isFinite(dt.getTime()) ? dt.toLocaleString('ja-JP', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+    meta.textContent = `${item.sender_name || `プレイヤー${item.sender_slot}`} · ${stamp}`;
+    const body = document.createElement('div');
+    body.className = 'chat-body';
+    body.textContent = item.message;
+    bubble.append(meta, body);
+    fragment.append(bubble);
+  }
+  root.append(fragment);
+  if (nearBottom) root.scrollTop = root.scrollHeight;
+}
+async function refreshChat(showError = true) {
+  if (!configured || !isAdmin || chatLoading) return;
+  chatLoading = true;
+  try {
+    // 最新100件を取得し、画面には時系列で表示します。
+    const data = await adminRequest('/rest/v1/dice_chat_messages?select=id,sender_slot,sender_name,message,created_at&order=id.desc&limit=100');
+    if (!Array.isArray(data)) throw new Error('メッセージの形式が不正です。');
+    const next = data.reverse();
+    const nextLastId = next.length ? next[next.length - 1].id : null;
+    if (nextLastId !== chatLastId || next.length !== chatRows.length) {
+      chatRows = next;
+      chatLastId = nextLastId;
+      renderChat(chatRows);
+    }
+    if ($('chatFeedback').classList.contains('error')) chatFeedback('');
+  } catch (error) {
+    if (showError) chatFeedback(`チャットを取得できません：${error.message}。setup_chat.sqlを確認してください。`, true);
+  } finally { chatLoading = false; }
+}
+$('chatRefresh').addEventListener('click', () => refreshChat(true));
+$('chatForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!isAdmin || !slotsReady) { chatFeedback('ログインまたはプレイヤー設定を確認してください。', true); return; }
+  const message = $('chatText').value.trim();
+  if (!message || message.length > 500) { chatFeedback('メッセージは1〜500文字で入力してください。', true); return; }
+  const button = $('chatSend');
+  button.disabled = true;
+  try {
+    await adminRequest('/rest/v1/dice_chat_messages', {
+      method:'POST',
+      body:{sender_slot:selectedSlot, sender_name:getActiveName(), message},
+      headers:{Prefer:'return=minimal'}
+    });
+    $('chatText').value = '';
+    chatFeedback('送信しました。');
+    await refreshChat(true);
+    $('chatMessages').scrollTop = $('chatMessages').scrollHeight;
+  } catch(error) { chatFeedback(`送信できません：${error.message}`, true); }
+  finally { button.disabled = false; }
+});
+
 async function deleteEntry(entry) {
   if (!isAdmin || !confirm(`${entry.mode} / ${entry.result === 'win' ? '勝ち' : '負け'} ${money(entry.amount)} G を削除しますか？`)) return;
   try {
@@ -482,6 +601,7 @@ $('loginForm').addEventListener('submit', async (event) => {
     $('loginDialog').close();
     await loadSlots();
     await refresh();
+    await refreshChat();
     notify('ログインしました。');
   } catch (e) { $('loginError').textContent = e.message; }
   finally { $('loginBtn').disabled = false; }
@@ -495,6 +615,9 @@ $('authBtn').addEventListener('click', async () => {
     slots = [];
     slotsReady = false;
     slotLoadError = '';
+    chatRows = [];
+    chatLastId = null;
+    $('chatMessages').replaceChildren();
     updateAuthUI();
     setConnection('offline', 'ログイン待ち');
     notify('ログアウトしました。');
@@ -541,10 +664,12 @@ if (!configured) {
   await checkAdmin();
   if (isAdmin) {
     await loadSlots();
+    await refreshChat();
   }
   await refresh();
   refreshTimer = setInterval(() => { if (!document.hidden) refresh(false); }, 30000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(false); });
+  chatTimer = setInterval(() => { if (!document.hidden) refreshChat(false); }, 4000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { refresh(false); refreshChat(false); } });
 }
 
 </script>
