@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1220">
+  <meta name="description" content="DQXのダイス収支をスマホで記録・非公開で管理するWebアプリ">
+  <title>DQX Dice Ledger | 収支管理</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="brandmark">D<span>◆</span></div><div><strong>DQX DICE LEDGER</strong><small>ダイス収支トラッカー</small></div></div>
+      <div class="top-actions"><span id="connectionBadge" class="status">接続確認中</span><button id="refreshBtn" class="icon-button" type="button" title="最新のデータを取得" aria-label="更新">↻</button></div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div><span class="eyebrow">PRIVATE DASHBOARD</span><h1>ダイス収支管理<span class="title-dot">.</span></h1><p>勝ち負けの履歴と収支を、自分だけで安全に管理。</p></div>
+        <div class="hero-right"><span id="viewerLabel" class="viewer">ログインが必要</span><button id="authBtn" class="subtle-button" type="button">ログイン</button></div>
+      </section>
+
+      <div id="notice" role="status" aria-live="polite" class="notice hidden"></div>
+
+      <section class="summary" aria-label="収支サマリー">
+        <article class="stat stat-net"><span class="stat-title">TOTAL PROFIT / 総収支</span><strong id="netTotal" class="huge">0 <em>G</em></strong><span id="netHint" class="stat-foot">記録された収支の合計</span></article>
+        <article class="stat"><span class="stat-title">TOTAL WINS / 勝ち総額</span><strong id="winTotal" class="positive">0 <em>G</em></strong><span id="winCount" class="stat-foot">0勝</span></article>
+        <article class="stat"><span class="stat-title">TOTAL LOSSES / 負け総額</span><strong id="lossTotal" class="negative">0 <em>G</em></strong><span id="lossCount" class="stat-foot">0敗</span></article>
+        <article class="stat"><span class="stat-title">WIN RATE / 勝率</span><strong id="winRate">—<em>%</em></strong><span id="gameCount" class="stat-foot">対戦 0 回</span></article>
+      </section>
+
+      <section class="content-grid">
+        <div class="main-column">
+          <section class="panel" aria-labelledby="historyTitle">
+            <div class="panel-top"><div><span class="eyebrow">TRANSACTIONS</span><h2 id="historyTitle">収支履歴</h2></div><span id="lastUpdated" class="muted tiny">未更新</span></div>
+            <div class="filters"><label class="field"><span>期間</span><select id="periodFilter"><option value="all">全期間</option><option value="month">今月</option><option value="week">直近7日</option><option value="today">今日</option></select></label><label class="field"><span>モード</span><select id="modeFilter"><option value="all">すべて</option><option value="通常">通常</option><option value="Z">Z</option><option value="逆Z">逆Z</option><option value="爆">爆</option></select></label><label class="field"><span>結果</span><select id="resultFilter"><option value="all">すべて</option><option value="win">勝ち</option><option value="loss">負け</option></select></label></div>
+            <div id="filterSummary" class="filter-summary">全件を表示</div>
+            <div id="history" class="history" aria-live="polite"><div class="empty">データを読み込んでいます</div></div>
+            <div class="panel-bottom"><span id="recordCount" class="muted tiny">0件</span><button id="moreBtn" type="button" class="subtle-button hidden">さらに表示</button></div>
+          </section>
+        </div>
+        <aside class="side-column">
+          <section id="entryPanel" class="panel hidden" aria-labelledby="entryTitle">
+            <div class="panel-top"><div><span class="eyebrow">ADMIN ONLY</span><h2 id="entryTitle">収支を記録</h2></div></div>
+            <form id="entryForm" class="entry-form">
+              <div class="result-toggle"><label><input checked type="radio" name="result" value="win"><span class="win-option">＋ 勝ち</span></label><label><input type="radio" name="result" value="loss"><span class="loss-option">－ 負け</span></label></div>
+              <label class="field"><span>金額（G）</span><input id="amount" type="number" min="1" max="999999999999" step="1" inputmode="numeric" placeholder="例：1000000" required></label>
+              <label class="field"><span>ダイスの種類</span><select id="entryMode"><option value="通常">通常</option><option value="Z">Z</option><option value="逆Z">逆Z</option><option value="爆">爆</option></select></label>
+              <label class="field"><span>日時</span><input id="playedAt" type="datetime-local" required></label>
+              <label class="field"><span>メモ（任意・最大200文字）</span><textarea id="memo" maxlength="200" rows="3" placeholder="対戦内容など"></textarea></label>
+              <button id="saveBtn" type="submit" class="primary-button">記録を保存</button>
+            </form>
+          </section>
+          <section class="panel"><div class="panel-top"><div><span class="eyebrow">INFORMATION</span><h2>プライバシー</h2></div></div><div class="info-copy"><p>ログインした本人だけが収支記録を閲覧できます。</p><p>記録の追加・削除も本人だけが行えます。</p><p>結果は自動で30秒ごとに再取得します。</p></div><button id="shareBtn" class="outline-button" type="button">URLをコピー</button></section>
+        </aside>
+      </section>
+      <footer>DQX Dice Ledger · 非公式ファン制作ツール · ゲーム内の外部サイトではありません</footer>
+    </main>
+  </div>
+
+  <dialog id="loginDialog" class="modal"><form id="loginForm" class="modal-inner"><div class="modal-top"><h2>ログイン</h2><button class="close-btn" id="closeLogin" type="button" aria-label="閉じる">×</button></div><p class="muted">管理者のメールアドレスとパスワードを入力。</p><label class="field"><span>メールアドレス</span><input id="email" type="email" autocomplete="username" required></label><label class="field"><span>パスワード</span><input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" class="error" role="alert"></div><button id="loginBtn" class="primary-button" type="submit">ログイン</button></form></dialog>
+</body>
+</html>
