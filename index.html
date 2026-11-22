@@ -5,10 +5,59 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b1220">
   <meta name="description" content="DQXのダイス収支をスマホで記録・非公開で管理するWebアプリ">
-  <title>DQX Dice Ledger | Profit Manager</title>
-  <link rel="stylesheet" href="style.css?v=20261122b">
+  <title>DQX Dice Ledger | Profit Manager (10 Slots)</title>
+  <style>
+:root{color-scheme:dark;--bg:#0a1020;--panel:#111a2b;--border:#273449;--text:#edf4ff;--muted:#91a2ba;--blue:#79b5ff;--green:#64e3b4;--red:#ff8394;--radius:13px}*{box-sizing:border-box}html{font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;background:var(--bg);color:var(--text)}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 85% 0%,#162440 0,transparent 40%),var(--bg)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--blue);outline-offset:2px}.shell{max-width:1220px;margin:auto;padding:0 22px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}.brand{display:flex;align-items:center;gap:12px}.brandmark{width:41px;height:41px;border-radius:10px;background:#2a4270;display:grid;place-items:center;font-size:24px;font-weight:900}.brandmark span{color:var(--blue);font-size:12px}.brand strong{display:block;letter-spacing:.1em;font-size:13px}.brand small{display:block;font-size:11px;color:var(--muted);margin-top:3px}.top-actions{display:flex;align-items:center;gap:10px}.status{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:50px;padding:7px 10px;white-space:nowrap}.status.online{color:var(--green);border-color:#28674f}.status.offline{color:var(--red);border-color:#6a3441}.icon-button{height:34px;width:34px;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:8px;font-size:22px}.hero{display:flex;justify-content:space-between;gap:18px;align-items:end;padding:45px 0 34px}.eyebrow{color:var(--blue);letter-spacing:.17em;font-size:10px;font-weight:800}.hero h1{font-size:clamp(28px,4vw,43px);letter-spacing:-.03em;margin:7px 0}.title-dot{color:var(--blue)}.hero p{color:var(--muted);font-size:13px;margin:0}.hero-right{display:flex;align-items:center;gap:12px}.viewer{font-size:12px;color:var(--muted)}.subtle-button,.outline-button{color:var(--text);background:transparent;border:1px solid var(--border);padding:10px 13px;border-radius:8px;font-size:12px;white-space:nowrap}.subtle-button:hover,.outline-button:hover{border-color:var(--blue)}.summary{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:12px;margin-bottom:22px}.stat{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px 19px;min-width:0}.stat-net{background:linear-gradient(140deg,#20365d,#15223b);border-color:#3b567e}.stat-title{display:block;color:#aebfd4;font-size:10px;font-weight:700;letter-spacing:.04em}.stat strong{display:block;font-size:clamp(20px,2.5vw,29px);font-weight:800;margin:15px 0;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}.stat .huge{font-size:clamp(24px,3vw,37px)}.stat strong em{font-style:normal;font-size:.45em;color:#91a2ba}.stat-foot{font-size:11px;color:var(--muted)}.positive{color:var(--green)}.negative{color:var(--red)}.content-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(285px,1fr);gap:18px}.side-column{display:flex;flex-direction:column;gap:18px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px}.panel-top{display:flex;justify-content:space-between;align-items:end;gap:10px;margin-bottom:20px}.panel h2{font-size:19px;margin:6px 0 0}.muted{color:var(--muted)}.tiny{font-size:11px}.filters{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.field{display:flex;flex-direction:column;gap:8px;min-width:0}.field>span{font-size:11px;color:#aebfd4;font-weight:600}select,input,textarea{width:100%;background:#0b1424;border:1px solid #344257;border-radius:8px;color:var(--text);padding:11px 12px;min-height:42px;outline:none}textarea{resize:vertical}select{appearance:auto}.filter-summary{font-size:11px;color:var(--muted);padding:19px 0 9px}.history{min-height:160px}.history-item{display:flex;align-items:center;gap:13px;padding:14px 0;border-bottom:1px solid #263145}.history-item:last-child{border-bottom:0}.result-symbol{flex:0 0 37px;width:37px;height:37px;border-radius:10px;display:grid;place-items:center;font-size:20px;font-weight:700}.result-symbol.win{background:#143d37;color:var(--green)}.result-symbol.loss{background:#4a2635;color:var(--red)}.record-main{flex:1;min-width:0}.record-heading{font-size:13px;font-weight:700}.record-sub{margin-top:4px;font-size:11px;color:var(--muted);overflow-wrap:anywhere}.record-amount{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}.delete-button{border:0;background:none;color:#8797ae;margin-left:2px;font-size:19px;padding:5px}.delete-button:hover{color:var(--red)}.panel-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:12px}.empty{text-align:center;color:var(--muted);padding:43px 10px;font-size:13px}.entry-form{display:flex;flex-direction:column;gap:16px}.result-toggle{display:grid;grid-template-columns:1fr 1fr;gap:9px}.result-toggle label{cursor:pointer}.result-toggle input{position:absolute;opacity:0;width:1px;height:1px}.result-toggle span{display:block;border:1px solid var(--border);border-radius:8px;text-align:center;padding:12px;font-size:13px;font-weight:700}.result-toggle input:checked+.win-option{border-color:var(--green);background:#143b34;color:var(--green)}.result-toggle input:checked+.loss-option{border-color:var(--red);background:#402433;color:var(--red)}.result-toggle input:focus-visible+span{outline:2px solid var(--blue)}.primary-button{border:0;border-radius:8px;background:#4d8ee8;color:#fff;font-weight:700;padding:13px 18px;min-height:45px}.primary-button:hover{background:#69a4f4}.info-copy{font-size:12px;color:var(--muted);line-height:1.9}.outline-button{width:100%;margin-top:12px}.notice{margin-bottom:18px;padding:12px 15px;border-radius:9px;background:#183452;border:1px solid #416a92;font-size:12px;line-height:1.6}.notice.error{background:#3c2030;border-color:#884355}.hidden{display:none!important}footer{padding:34px 0 22px;text-align:center;color:#62748b;font-size:10px}.modal{background:#141f31;color:var(--text);border:1px solid #42546d;border-radius:15px;width:min(calc(100% - 28px),420px);padding:0;box-shadow:0 25px 80px #0008}.modal::backdrop{background:#000a}.modal-inner{padding:24px;display:flex;flex-direction:column;gap:16px}.modal-top{display:flex;align-items:center;justify-content:space-between}.modal h2{margin:0;font-size:19px}.modal p{font-size:12px;margin:0}.close-btn{background:none;border:0;color:var(--muted);font-size:26px}.error{font-size:12px;color:var(--red)}@media(max-width:900px){.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.side-column{display:grid;grid-template-columns:1fr 1fr}.stat strong{font-size:25px}}@media(max-width:600px){.shell{padding:0 13px}.topbar{height:68px}.brand strong{font-size:11px}.brandmark{width:36px;height:36px}.hero{padding:30px 0 23px;align-items:start;flex-direction:column}.hero-right{width:100%;justify-content:space-between}.summary{gap:9px;margin-bottom:12px}.stat{padding:17px 13px}.stat strong,.stat .huge{font-size:clamp(20px,5.3vw,27px);margin:14px 0}.stat-title{font-size:9px}.stat-foot{font-size:10px}.content-grid{gap:12px}.panel{padding:16px}.side-column{display:flex;flex-direction:column}.filters{gap:6px}.filters select{padding:9px 4px;font-size:12px}.record-amount{font-size:12px}.record-sub{font-size:10px}.record-heading{font-size:12px}.history-item{gap:9px}.top-actions{gap:6px}.status{font-size:10px;padding:7px}.viewer{font-size:11px}}
+
+.profile-panel{background:#111a2b;border:1px solid #273449;border-radius:13px;padding:18px;margin-bottom:20px}.profile-heading{display:flex;justify-content:space-between;gap:12px;align-items:end;margin-bottom:14px}.profile-heading h2{font-size:17px;margin:5px 0 0}.slot-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}.slot-button{background:#0b1424;border:1px solid #344257;color:#dce8fa;border-radius:8px;padding:12px 6px;font-size:12px;min-width:0;overflow-wrap:anywhere}.slot-button.active{background:#1c426e;border-color:#79b5ff;color:#fff;font-weight:700}.slot-button:disabled{opacity:.5}.slot-edit{display:flex;align-items:end;gap:10px;margin-top:14px}.slot-edit .field{flex:1}.slot-edit button{height:42px}.slot-edit input{max-width:360px}@media(max-width:600px){.slot-buttons{grid-template-columns:repeat(2,minmax(0,1fr))}.slot-edit{align-items:stretch;flex-direction:column}.slot-edit input{max-width:none}}
+
+/* Quick amount presets: keep the manual amount field usable. */
+.quick-amount-group{display:flex;flex-direction:column;gap:8px}
+.quick-amount-label{font-size:11px;color:#aebfd4;font-weight:600}
+.quick-amount-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.quick-amount-button{min-width:0;min-height:42px;padding:9px 4px;background:#0b1424;border:1px solid #344257;border-radius:8px;color:#dce8fa;font-size:12px;font-weight:700;white-space:nowrap}
+.quick-amount-button:hover{border-color:#79b5ff;background:#192943}
+.quick-amount-button[aria-pressed="true"]{background:#1c426e;border-color:#79b5ff;color:#fff}
+.quick-amount-button:focus-visible{outline:2px solid #79b5ff;outline-offset:2px}
+
+/* Unified controls (2026-11-22): consistent height, spacing and focus states. */
+:root{--control-height:44px;--control-radius:10px;--control-bg:#101d31;--control-border:#39516c;--control-hover:#1a3150}
+button{font-family:inherit;transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease;touch-action:manipulation}
+button:not(:disabled):active{transform:translateY(1px)}
+.subtle-button,.outline-button,.slot-button,.quick-amount-button,.icon-button,.primary-button,.result-toggle span{border-radius:var(--control-radius);min-height:var(--control-height)}
+.subtle-button,.outline-button,.slot-button,.quick-amount-button,.icon-button{background:var(--control-bg);border:1px solid var(--control-border);color:var(--text)}
+.subtle-button:hover,.outline-button:hover,.slot-button:not(:disabled):hover,.quick-amount-button:hover,.icon-button:hover{background:var(--control-hover);border-color:var(--blue)}
+.slot-buttons{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.slot-button{padding:10px 8px;min-height:48px;line-height:1.3;font-size:12px;font-weight:650;overflow-wrap:anywhere}
+.slot-button.active,.quick-amount-button[aria-pressed="true"]{background:#254b79;color:#fff;border-color:#79b5ff;box-shadow:inset 0 0 0 1px #79b5ff33}
+.slot-button:disabled{opacity:.72;cursor:not-allowed}
+.quick-amount-group{gap:10px}
+.quick-amount-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.quick-amount-button{min-width:0;min-height:48px;padding:10px 6px;font-size:13px;font-weight:700;white-space:nowrap}
+.quick-amount-button[aria-pressed="true"]::after{content:" ✓";color:#a7e8ff}
+.slot-status{font-size:12px;line-height:1.5;color:var(--muted);margin:12px 0 0}
+.slot-status.slot-error{color:#ffacb8;background:#422435;border:1px solid #895166;padding:10px 12px;border-radius:var(--control-radius)}
+.profile-panel{border-color:#344865}
+.profile-heading{margin-bottom:14px}
+.result-toggle span{display:grid;place-items:center;padding:11px}
+.primary-button{background:#4d8ee8;border:1px solid #73a9ef}
+.primary-button:hover{background:#5e9bf0}
+input,select,textarea{border-radius:var(--control-radius);border-color:var(--control-border)}
+@media(max-width:600px){.slot-buttons{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.slot-button{font-size:13px}.quick-amount-button{font-size:13px}.profile-panel{padding:15px}.slot-status{font-size:11px}}
+
+</style>
   <script src="config.js"></script>
-  <script type="module" src="app.js?v=20261122b"></script>
+  
+<script>
+window.addEventListener('error', function(event) {
+  const status = document.getElementById('slotStatus');
+  if (status) {status.textContent = '画面の処理に失敗しました。ブラウザを更新してください。' + (event.message ? ' ' + event.message : ''); status.classList.add('slot-error');}
+});
+window.addEventListener('unhandledrejection', function(event) {
+  const status = document.getElementById('slotStatus');
+  if (status) {status.textContent = 'データの処理に失敗しました。' + (event.reason && event.reason.message ? ' ' + event.reason.message : ''); status.classList.add('slot-error');}
+});
+</script>
 </head>
 <body>
   <div class="shell">
@@ -25,7 +74,7 @@
 
       <section class="profile-panel" id="profilesPanel" aria-label="管理対象を切り替える">
         <div class="profile-heading"><div><span class="eyebrow">PLAYER SLOTS</span><h2>管理データを選択</h2></div><span class="muted tiny">共通ログイン・10人分</span></div>
-        <div id="slotButtons" class="slot-buttons"></div>
+        <div id="slotButtons" class="slot-buttons"><button type="button" class="slot-button active" disabled>プレイヤー1</button><button type="button" class="slot-button" disabled>プレイヤー2</button><button type="button" class="slot-button" disabled>プレイヤー3</button><button type="button" class="slot-button" disabled>プレイヤー4</button><button type="button" class="slot-button" disabled>プレイヤー5</button><button type="button" class="slot-button" disabled>プレイヤー6</button><button type="button" class="slot-button" disabled>プレイヤー7</button><button type="button" class="slot-button" disabled>プレイヤー8</button><button type="button" class="slot-button" disabled>プレイヤー9</button><button type="button" class="slot-button" disabled>プレイヤー10</button></div>
         <p id="slotStatus" class="slot-status" role="status" aria-live="polite">10人分の切り替えを準備中…</p>
         <div id="slotEdit" class="slot-edit hidden"><label class="field"><span>選択中の名前</span><input id="slotName" maxlength="30" placeholder="名前を入力"></label><button id="renameSlot" type="button" class="subtle-button">名前を保存</button></div>
       </section>
@@ -80,5 +129,420 @@
   </div>
 
   <dialog id="loginDialog" class="modal"><form id="loginForm" class="modal-inner"><div class="modal-top"><h2>ログイン</h2><button class="close-btn" id="closeLogin" type="button" aria-label="閉じる">×</button></div><p class="muted">共有する1つのメールアドレスとパスワードを入力。</p><label class="field"><span>メールアドレス</span><input id="email" type="email" autocomplete="username" required></label><label class="field"><span>パスワード</span><input id="password" type="password" autocomplete="current-password" required></label><div id="loginError" class="error" role="alert"></div><button id="loginBtn" class="primary-button" type="submit">ログイン</button></form></dialog>
+<script type="module">
+const cfg = window.DQX_CONFIG || {};
+const configured = /^https:\/\/[\w.-]+\.supabase\.co\/?$/.test(cfg.SUPABASE_URL || '') && !!cfg.SUPABASE_ANON_KEY;
+const base = (cfg.SUPABASE_URL || '').replace(/\/$/, '');
+const $ = (id) => document.getElementById(id);
+let session = null;
+let isAdmin = false;
+let records = [];
+let slots = [];
+let selectedSlot = 1;
+let displayLimit = 30;
+let refreshing = false;
+let refreshTimer = null;
+let slotLoadError = '';
+let slotsReady = false;
+const formatter = new Intl.NumberFormat('ja-JP');
+const money = (n) => formatter.format(n);
+const STORAGE_KEY = 'dqx_dice_session_v1';
+
+function notify(message, error = false) {
+  const el = $('notice');
+  el.textContent = message;
+  el.className = `notice${error ? ' error' : ''}`;
+}
+function clearNotice() { $('notice').classList.add('hidden'); }
+function setConnection(state, text) {
+  $('connectionBadge').className = `status ${state}`;
+  $('connectionBadge').textContent = text;
+}
+function dateInputNow() {
+  const d = new Date();
+  const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+function loadSession() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null'); }
+  catch { localStorage.removeItem(STORAGE_KEY); return null; }
+}
+function saveSession(value) {
+  session = value;
+  if (value) localStorage.setItem(STORAGE_KEY, JSON.stringify(value));
+  else localStorage.removeItem(STORAGE_KEY);
+}
+async function request(path, { method = 'GET', body = undefined, token = null, headers = {} } = {}) {
+  const response = await fetch(`${base}${path}`, {
+    method,
+    headers: {
+      apikey: cfg.SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${token || cfg.SUPABASE_ANON_KEY}`,
+      ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      ...headers
+    },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+  });
+  let data = null;
+  const raw = await response.text();
+  if (raw) {
+    try { data = JSON.parse(raw); }
+    catch { throw new Error('サーバーの返答を読み取れませんでした。'); }
+  }
+  if (!response.ok) throw new Error(data?.msg || data?.message || data?.error_description || `通信エラー（${response.status}）`);
+  return data;
+}
+async function updateToken() {
+  if (!session?.refresh_token) return false;
+  try {
+    const updated = await request('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: session.refresh_token } });
+    saveSession(updated);
+    return true;
+  } catch {
+    saveSession(null);
+    isAdmin = false;
+    updateAuthUI();
+    return false;
+  }
+}
+async function adminRequest(path, options = {}) {
+  if (!session?.access_token) throw new Error('ログインが必要です。');
+  if (session.expires_at && Date.now() / 1000 > session.expires_at - 60) {
+    if (!(await updateToken())) throw new Error('ログイン期限が切れました。');
+  }
+  return request(path, { ...options, token: session.access_token });
+}
+async function checkAdmin() {
+  isAdmin = false;
+  if (!session?.user?.id) { updateAuthUI(); return; }
+  try {
+    const rows = await adminRequest(`/rest/v1/admin_users?select=id&id=eq.${encodeURIComponent(session.user.id)}&limit=1`);
+    isAdmin = Array.isArray(rows) && rows.length === 1;
+  } catch {
+    isAdmin = false;
+  }
+  updateAuthUI();
+}
+function updateSlotUI() {
+  const root = $('slotButtons');
+  root.replaceChildren();
+  for (let i = 1; i <= 10; i++) {
+    const entry = slots.find(s => Number(s.slot) === i);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `slot-button${selectedSlot === i ? ' active' : ''}`;
+    btn.textContent = entry?.name || `プレイヤー${i}`;
+    btn.disabled = !isAdmin || !slotsReady;
+    btn.title = !isAdmin ? 'ログイン後に選択できます' : !slotsReady ? '10人分の設定を確認してください' : `${btn.textContent}の収支を表示`;
+    btn.addEventListener('click', async () => {
+      if (selectedSlot === i || !isAdmin) return;
+      selectedSlot = i;
+      records = [];
+      displayLimit = 30;
+      updateSlotUI();
+      render();
+      if (refreshing) {
+        const waitUntilFree = async () => {
+          if (refreshing) { window.setTimeout(waitUntilFree, 100); return; }
+          await refresh();
+        };
+        window.setTimeout(waitUntilFree, 100);
+      } else await refresh();
+    });
+    root.append(btn);
+  }
+  $('slotEdit').classList.toggle('hidden', !isAdmin || !slotsReady);
+  const message = $('slotStatus');
+  if (message) {
+    message.textContent = !isAdmin ? 'ログインすると10人分の記録を切り替えられます。' : slotLoadError ? `切り替え設定エラー：${slotLoadError}` : slotsReady ? `現在の選択：${slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`}` : '10人分の設定を確認中…';
+    message.classList.toggle('slot-error', Boolean(slotLoadError));
+  }
+  $('slotName').value = slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`;
+}
+async function loadSlots() {
+  if (!isAdmin) { slots = []; slotsReady = false; slotLoadError = ''; updateSlotUI(); return; }
+  slotsReady = false;
+  slotLoadError = '';
+  updateSlotUI();
+  try {
+    const data = await adminRequest('/rest/v1/dice_profiles?select=slot,name&order=slot.asc');
+    if (!Array.isArray(data) || data.length !== 10 || Array.from({length:10}, (_,i) => i + 1).some(i => !data.some(s => Number(s.slot) === i))) {
+      throw new Error('10人分のデータがありません。setup_ten_slots.sqlを実行してください。');
+    }
+    slots = data;
+    slotsReady = true;
+    slotLoadError = '';
+  } catch (error) {
+    slots = [];
+    slotLoadError = (error.message || '取得に失敗しました。') + '（Supabaseのsetup_ten_slots.sqlと権限を確認）';
+    notify(`10人の切り替えが使えません。${slotLoadError}`, true);
+  }
+  updateSlotUI();
+}
+function updateAuthUI() {
+  $('entryPanel').classList.toggle('hidden', !isAdmin);
+  $('viewerLabel').textContent = isAdmin ? `${session.user.email || 'ユーザー'}でログイン中` : 'ログインが必要';
+  $('authBtn').textContent = session ? 'ログアウト' : 'ユーザーログイン';
+  updateSlotUI();
+  render();
+}
+async function fetchAll() {
+  const result = [];
+  const pageSize = 1000;
+  for (let offset = 0; offset < 20000; offset += pageSize) {
+    const chunk = await adminRequest(`/rest/v1/dice_entries?select=id,result,amount,mode,memo,played_at,created_at&profile_slot=eq.${selectedSlot}&order=played_at.desc,id.desc&limit=${pageSize}&offset=${offset}`);
+    if (!Array.isArray(chunk)) throw new Error('記録データの形式が不正です。');
+    result.push(...chunk);
+    if (chunk.length < pageSize) return { records: result, truncated: false };
+  }
+  return { records: result, truncated: true };
+}
+async function refresh(showError = true) {
+  if (!configured || refreshing) return;
+  if (!isAdmin) { records = []; render(); setConnection('offline', 'ログイン待ち'); $('lastUpdated').textContent = 'ログイン後に表示'; return; }
+  refreshing = true;
+  const requestedSlot = selectedSlot;
+  $('refreshBtn').disabled = true;
+  try {
+    const fetched = await fetchAll();
+    if (requestedSlot !== selectedSlot) return;
+    records = fetched.records;
+    setConnection('online', '非公開データ接続中');
+    if (slotLoadError) notify(`10人の切り替えが使えません。${slotLoadError}`, true);
+    else if (fetched.truncated) notify('記録が20,000件を超えたため、一部の履歴が集計対象外です。', true);
+    else clearNotice();
+    $('lastUpdated').textContent = `${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} 更新`;
+    render();
+  } catch (error) {
+    if (requestedSlot !== selectedSlot) return;
+    setConnection('offline', '取得エラー');
+    if (showError) notify(`データを取得できません。${error.message}`, true);
+  } finally {
+    refreshing = false;
+    $('refreshBtn').disabled = false;
+  }
+}
+function filteredRecords() {
+  const period = $('periodFilter').value;
+  const mode = $('modeFilter').value;
+  const result = $('resultFilter').value;
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startWeek = new Date(now.getTime() - 7 * 86400000);
+  return records.filter((record) => {
+    const at = new Date(record.played_at);
+    if (!Number.isFinite(at.getTime())) return false;
+    if (period === 'today' && at < startToday) return false;
+    if (period === 'week' && at < startWeek) return false;
+    if (period === 'month' && at < startMonth) return false;
+    if (mode !== 'all' && record.mode !== mode) return false;
+    if (result !== 'all' && record.result !== result) return false;
+    return true;
+  });
+}
+function render() {
+  if (!configured) return;
+  const allWins = records.filter((r) => r.result === 'win');
+  const allLosses = records.filter((r) => r.result === 'loss');
+  const won = allWins.reduce((s, r) => s + Number(r.amount), 0);
+  const lost = allLosses.reduce((s, r) => s + Number(r.amount), 0);
+  const net = won - lost;
+  $('netTotal').innerHTML = `${net >= 0 ? '+' : '−'}${money(Math.abs(net))} <em>G</em>`;
+  $('netTotal').className = `huge ${net >= 0 ? 'positive' : 'negative'}`;
+  $('winTotal').innerHTML = `${money(won)} <em>G</em>`;
+  $('lossTotal').innerHTML = `${money(lost)} <em>G</em>`;
+  $('winCount').textContent = `${money(allWins.length)}勝`;
+  $('lossCount').textContent = `${money(allLosses.length)}敗`;
+  $('winRate').innerHTML = `${records.length ? ((allWins.length / records.length) * 100).toFixed(1) : '—'}<em>%</em>`;
+  $('gameCount').textContent = `対戦 ${money(records.length)} 回`;
+  const visible = filteredRecords();
+  const filteredNet = visible.reduce((sum, r) => sum + (r.result === 'win' ? 1 : -1) * Number(r.amount), 0);
+  $('filterSummary').textContent = `絞り込み：${money(visible.length)}件 / 収支 ${filteredNet >= 0 ? '+' : '−'}${money(Math.abs(filteredNet))} G`;
+  $('recordCount').textContent = `${money(visible.length)}件中 ${money(Math.min(visible.length, displayLimit))}件表示`;
+  $('moreBtn').classList.toggle('hidden', visible.length <= displayLimit);
+  const root = $('history');
+  root.replaceChildren();
+  if (!visible.length) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'この条件の記録はありません。';
+    root.append(empty);
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  for (const r of visible.slice(0, displayLimit)) {
+    const row = document.createElement('div');
+    row.className = 'history-item';
+    const symbol = document.createElement('div');
+    symbol.className = `result-symbol ${r.result}`;
+    symbol.textContent = r.result === 'win' ? '+' : '−';
+    const middle = document.createElement('div');
+    middle.className = 'record-main';
+    const title = document.createElement('div');
+    title.className = 'record-heading';
+    title.textContent = `${r.result === 'win' ? 'WIN / 勝ち' : 'LOSE / 負け'}  ·  ${r.mode}`;
+    const sub = document.createElement('div');
+    sub.className = 'record-sub';
+    sub.textContent = `${new Date(r.played_at).toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}${r.memo ? ` · ${r.memo}` : ''}`;
+    middle.append(title, sub);
+    const amount = document.createElement('div');
+    amount.className = `record-amount ${r.result === 'win' ? 'positive' : 'negative'}`;
+    amount.textContent = `${r.result === 'win' ? '+' : '−'}${money(r.amount)} G`;
+    row.append(symbol, middle, amount);
+    if (isAdmin) {
+      const del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'delete-button';
+      del.textContent = '×';
+      del.setAttribute('aria-label', 'この記録を削除');
+      del.addEventListener('click', () => deleteEntry(r));
+      row.append(del);
+    }
+    fragment.append(row);
+  }
+  root.append(fragment);
+}
+async function deleteEntry(entry) {
+  if (!isAdmin || !confirm(`${entry.mode} / ${entry.result === 'win' ? '勝ち' : '負け'} ${money(entry.amount)} G を削除しますか？`)) return;
+  try {
+    await adminRequest(`/rest/v1/dice_entries?id=eq.${encodeURIComponent(entry.id)}`, { method: 'DELETE' });
+    await refresh();
+  } catch (e) { notify(`削除できません。${e.message}`, true); }
+}
+// Quick amount buttons fill the existing manual input; manual edits remain possible.
+const amountField = $('amount');
+const quickAmountButtons = [...document.querySelectorAll('.quick-amount-button')];
+function syncQuickAmountSelection() {
+  for (const button of quickAmountButtons) {
+    button.setAttribute('aria-pressed', String(button.dataset.amount === amountField.value));
+  }
+}
+const quickAmountGroup = document.querySelector('.quick-amount-buttons');
+quickAmountGroup?.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-amount]');
+  if (!button || !quickAmountGroup.contains(button)) return;
+  amountField.value = button.dataset.amount;
+  amountField.dispatchEvent(new Event('input', { bubbles: true }));
+  syncQuickAmountSelection();
+});
+amountField.addEventListener('input', syncQuickAmountSelection);
+$('entryForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (!isAdmin) return;
+  if (!slotsReady) { notify('10人の設定が未完了です。setup_ten_slots.sqlを実行してください。', true); return; }
+  const amount = Number($('amount').value);
+  const played = new Date($('playedAt').value);
+  if (!Number.isSafeInteger(amount) || amount < 1 || amount > 999999999999 || !Number.isFinite(played.getTime())) {
+    notify('金額または日時を確認してください。', true);
+    return;
+  }
+  const button = $('saveBtn');
+  button.disabled = true;
+  try {
+    await adminRequest('/rest/v1/dice_entries', {
+      method: 'POST',
+      body: {
+        result: document.querySelector('input[name="result"]:checked').value,
+        amount,
+        mode: $('entryMode').value,
+        memo: $('memo').value.trim(),
+        played_at: played.toISOString(),
+        profile_slot: selectedSlot
+      },
+      headers: { Prefer: 'return=minimal' }
+    });
+    $('amount').value = '';
+    syncQuickAmountSelection();
+    $('memo').value = '';
+    $('playedAt').value = dateInputNow();
+    await refresh();
+    notify('記録を保存しました。');
+  } catch (e) { notify(`保存できません。${e.message}`, true); }
+  finally { button.disabled = false; }
+});
+$('loginForm').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  $('loginError').textContent = '';
+  $('loginBtn').disabled = true;
+  try {
+    const auth = await request('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: $('email').value.trim(), password: $('password').value } });
+    saveSession(auth);
+    await checkAdmin();
+    if (!isAdmin) {
+      saveSession(null);
+      updateAuthUI();
+      throw new Error('このアカウントは利用許可されていません。');
+    }
+    $('password').value = '';
+    $('loginDialog').close();
+    await loadSlots();
+    await refresh();
+    notify('ログインしました。');
+  } catch (e) { $('loginError').textContent = e.message; }
+  finally { $('loginBtn').disabled = false; }
+});
+$('authBtn').addEventListener('click', async () => {
+  if (session) {
+    try { await adminRequest('/auth/v1/logout', { method: 'POST' }); } catch { /* local logout always works */ }
+    saveSession(null);
+    isAdmin = false;
+    records = [];
+    slots = [];
+    slotsReady = false;
+    slotLoadError = '';
+    updateAuthUI();
+    setConnection('offline', 'ログイン待ち');
+    notify('ログアウトしました。');
+  } else $('loginDialog').showModal();
+});
+$('closeLogin').addEventListener('click', () => $('loginDialog').close());
+$('loginDialog').addEventListener('click', (event) => { if (event.target === $('loginDialog')) $('loginDialog').close(); });
+$('refreshBtn').addEventListener('click', () => refresh());
+$('shareBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(location.href.split('?')[0].split('#')[0]);
+    notify('URLをコピーしました。データを見るには共通アカウントでログインが必要です。');
+  } catch { notify('URLをコピーできません。ブラウザのアドレス欄からコピーしてください。', true); }
+});
+for (const id of ['periodFilter', 'modeFilter', 'resultFilter']) {
+  $(id).addEventListener('change', () => { displayLimit = 30; render(); });
+}
+$('moreBtn').addEventListener('click', () => { displayLimit += 30; render(); });
+$('renameSlot').addEventListener('click', async () => {
+  if (!isAdmin || !slotsReady) return;
+  const name = $('slotName').value.trim();
+  if (!name || name.length > 30) { notify('名前は1〜30文字で入力してください。', true); return; }
+  const button = $('renameSlot');
+  button.disabled = true;
+  try {
+    await adminRequest(`/rest/v1/dice_profiles?slot=eq.${selectedSlot}`, {
+      method: 'PATCH', body: { name }, headers: { Prefer: 'return=minimal' }
+    });
+    await loadSlots();
+    notify('名前を保存しました。');
+  } catch (error) { notify(`名前を変更できません。${error.message}`, true); }
+  finally { button.disabled = false; }
+});
+$('playedAt').value = dateInputNow();
+updateSlotUI();
+if (!configured) {
+  setConnection('offline', '初期設定が必要');
+  $('history').replaceChildren();
+  notify('公開前の設定が必要です。config.jsにSupabaseのURLと公開用キーを入力してください。', true);
+  $('history').textContent = 'データベースの接続設定後に記録が表示されます。';
+  $('authBtn').disabled = true;
+} else {
+  saveSession(loadSession());
+  await checkAdmin();
+  if (isAdmin) {
+    await loadSlots();
+  }
+  await refresh();
+  refreshTimer = setInterval(() => { if (!document.hidden) refresh(false); }, 30000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(false); });
+}
+
+</script>
 </body>
 </html>
