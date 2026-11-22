@@ -76,7 +76,7 @@ window.addEventListener('unhandledrejection', function(event) {
         <div class="profile-heading"><div><span class="eyebrow">PLAYER SLOTS</span><h2>管理データを選択</h2></div><span class="muted tiny">共通ログイン・10人分</span></div>
         <div id="slotButtons" class="slot-buttons"><button type="button" class="slot-button active" disabled>プレイヤー1</button><button type="button" class="slot-button" disabled>プレイヤー2</button><button type="button" class="slot-button" disabled>プレイヤー3</button><button type="button" class="slot-button" disabled>プレイヤー4</button><button type="button" class="slot-button" disabled>プレイヤー5</button><button type="button" class="slot-button" disabled>プレイヤー6</button><button type="button" class="slot-button" disabled>プレイヤー7</button><button type="button" class="slot-button" disabled>プレイヤー8</button><button type="button" class="slot-button" disabled>プレイヤー9</button><button type="button" class="slot-button" disabled>プレイヤー10</button></div>
         <p id="slotStatus" class="slot-status" role="status" aria-live="polite">10人分の切り替えを準備中…</p>
-        <div id="slotEdit" class="slot-edit hidden"><label class="field"><span>選択中の名前</span><input id="slotName" maxlength="30" placeholder="名前を入力"></label><button id="renameSlot" type="button" class="subtle-button">名前を保存</button></div>
+        <div id="slotEdit" class="slot-edit"><label class="field"><span>プレイヤー名を変更（選択中の枠）</span><input id="slotName" maxlength="30" placeholder="プレイヤー名を入力" disabled></label><button id="renameSlot" type="button" class="primary-button" disabled>名前を変更して保存</button></div><p id="renameHelp" class="slot-status">設定後にプレイヤーを選択し、名前を書き換えて保存できます。</p>
       </section>
 
       <div id="notice" role="status" aria-live="polite" class="notice hidden"></div>
@@ -235,7 +235,8 @@ function updateSlotUI() {
     btn.disabled = !isAdmin || !slotsReady;
     btn.title = !isAdmin ? 'ログイン後に選択できます' : !slotsReady ? '10人分の設定を確認してください' : `${btn.textContent}の収支を表示`;
     btn.addEventListener('click', async () => {
-      if (selectedSlot === i || !isAdmin) return;
+      if (!slotsReady || !isAdmin) return;
+      if (selectedSlot === i) { $('slotName').focus(); return; }
       selectedSlot = i;
       records = [];
       displayLimit = 30;
@@ -251,7 +252,10 @@ function updateSlotUI() {
     });
     root.append(btn);
   }
-  $('slotEdit').classList.toggle('hidden', !isAdmin || !slotsReady);
+  $('slotEdit').classList.remove('hidden');
+  $('slotName').disabled = !isAdmin || !slotsReady;
+  $('renameSlot').disabled = !isAdmin || !slotsReady;
+  $('renameHelp').textContent = !isAdmin ? 'ログイン後に名前を変更できます。' : !slotsReady ? 'Supabaseに10人分のデータを作成すると、名前を変更できます。' : `「${slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`}」の名前を変更できます。`;
   const message = $('slotStatus');
   if (message) {
     message.textContent = !isAdmin ? 'ログインすると10人分の記録を切り替えられます。' : slotLoadError ? `切り替え設定エラー：${slotLoadError}` : slotsReady ? `現在の選択：${slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`}` : '10人分の設定を確認中…';
@@ -274,7 +278,7 @@ async function loadSlots() {
     slotLoadError = '';
   } catch (error) {
     slots = [];
-    slotLoadError = (error.message || '取得に失敗しました。') + '（Supabaseのsetup_ten_slots.sqlと権限を確認）';
+    slotLoadError = (error.message || '取得に失敗しました。') + '（先に同梱のsetup_ten_slots.sqlをSQL Editorで実行してください）';
     notify(`10人の切り替えが使えません。${slotLoadError}`, true);
   }
   updateSlotUI();
@@ -520,7 +524,7 @@ $('renameSlot').addEventListener('click', async () => {
       method: 'PATCH', body: { name }, headers: { Prefer: 'return=minimal' }
     });
     await loadSlots();
-    notify('名前を保存しました。');
+    notify(`プレイヤー${selectedSlot}の名前を「${name}」に変更しました。`);
   } catch (error) { notify(`名前を変更できません。${error.message}`, true); }
   finally { button.disabled = false; }
 });
