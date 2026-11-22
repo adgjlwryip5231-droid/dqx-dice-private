@@ -5,6 +5,8 @@ const $ = (id) => document.getElementById(id);
 let session = null;
 let isAdmin = false;
 let records = [];
+let slots = [];
+let selectedSlot = 1;
 let displayLimit = 30;
 let refreshing = false;
 let refreshTimer = null;
@@ -87,17 +89,49 @@ async function checkAdmin() {
   }
   updateAuthUI();
 }
+function updateSlotUI() {
+  const root = $('slotButtons');
+  root.replaceChildren();
+  for (let i = 1; i <= 10; i++) {
+    const entry = slots.find(s => Number(s.slot) === i);
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `slot-button${selectedSlot === i ? ' active' : ''}`;
+    btn.textContent = entry?.name || `プレイヤー${i}`;
+    btn.disabled = !isAdmin;
+    btn.addEventListener('click', async () => {
+      if (selectedSlot === i || !isAdmin) return;
+      selectedSlot = i;
+      records = [];
+      displayLimit = 30;
+      updateSlotUI();
+      render();
+      await refresh();
+    });
+    root.append(btn);
+  }
+  $('slotEdit').classList.toggle('hidden', !isAdmin);
+  $('slotName').value = slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`;
+}
+async function loadSlots() {
+  if (!isAdmin) { slots = []; updateSlotUI(); return; }
+  const data = await adminRequest('/rest/v1/dice_profiles?select=slot,name&order=slot.asc');
+  if (!Array.isArray(data) || data.length !== 10) throw new Error('10人分の設定がありません。SQLを実行してください。');
+  slots = data;
+  updateSlotUI();
+}
 function updateAuthUI() {
   $('entryPanel').classList.toggle('hidden', !isAdmin);
-  $('viewerLabel').textContent = isAdmin ? '本人ログイン中' : 'ログインが必要';
-  $('authBtn').textContent = session ? 'ログアウト' : '管理者ログイン';
+  $('viewerLabel').textContent = isAdmin ? `${session.user.email || 'ユーザー'}でログイン中` : 'ログインが必要';
+  $('authBtn').textContent = session ? 'ログアウト' : 'ユーザーログイン';
+  updateSlotUI();
   render();
 }
 async function fetchAll() {
   const result = [];
   const pageSize = 1000;
   for (let offset = 0; offset < 20000; offset += pageSize) {
-    const chunk = await adminRequest(`/rest/v1/dice_entries?select=id,result,amount,mode,memo,played_at,created_at&order=played_at.desc,id.desc&limit=${pageSize}&offset=${offset}`);
+    const chunk = await adminRequest(`/rest/v1/dice_entries?select=id,result,amount,mode,memo,played_at,created_at&profile_slot=eq.${selectedSlot}&order=played_at.desc,id.desc&limit=${pageSize}&offset=${offset}`);
     if (!Array.isArray(chunk)) throw new Error('記録データの形式が不正です。');
     result.push(...chunk);
     if (chunk.length < pageSize) return { records: result, truncated: false };
@@ -108,9 +142,11 @@ async function refresh(showError = true) {
   if (!configured || refreshing) return;
   if (!isAdmin) { records = []; render(); setConnection('offline', 'ログイン待ち'); $('lastUpdated').textContent = 'ログイン後に表示'; return; }
   refreshing = true;
+  const requestedSlot = selectedSlot;
   $('refreshBtn').disabled = true;
   try {
     const fetched = await fetchAll();
+    if (requestedSlot !== selectedSlot) return;
     records = fetched.records;
     setConnection('online', '非公開データ接続中');
     if (fetched.truncated) notify('記録が20,000件を超えたため、一部の履歴が集計対象外です。', true);
@@ -118,6 +154,7 @@ async function refresh(showError = true) {
     $('lastUpdated').textContent = `${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} 更新`;
     render();
   } catch (error) {
+    if (requestedSlot !== selectedSlot) return;
     setConnection('offline', '取得エラー');
     if (showError) notify(`データを取得できません。${error.message}`, true);
   } finally {
@@ -213,6 +250,21 @@ async function deleteEntry(entry) {
     await refresh();
   } catch (e) { notify(`削除できません。${e.message}`, true); }
 }
+// Quick amount buttons fill the existing manual input; manual edits remain possible.
+const amountField = $('amount');
+const quickAmountButtons = [...document.querySelectorAll('.quick-amount-button')];
+function syncQuickAmountSelection() {
+  for (const button of quickAmountButtons) {
+    button.setAttribute('aria-pressed', String(button.dataset.amount === amountField.value));
+  }
+}
+for (const button of quickAmountButtons) {
+  button.addEventListener('click', () => {
+    amountField.value = button.dataset.amount;
+    syncQuickAmountSelection();
+  });
+}
+amountField.addEventListener('input', syncQuickAmountSelection);
 $('entryForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!isAdmin) return;
@@ -232,11 +284,13 @@ $('entryForm').addEventListener('submit', async (event) => {
         amount,
         mode: $('entryMode').value,
         memo: $('memo').value.trim(),
-        played_at: played.toISOString()
+        played_at: played.toISOString(),
+        profile_slot: selectedSlot
       },
       headers: { Prefer: 'return=minimal' }
     });
     $('amount').value = '';
+    syncQuickAmountSelection();
     $('memo').value = '';
     $('playedAt').value = dateInputNow();
     await refresh();
@@ -255,10 +309,11 @@ $('loginForm').addEventListener('submit', async (event) => {
     if (!isAdmin) {
       saveSession(null);
       updateAuthUI();
-      throw new Error('管理者権限がありません。');
+      throw new Error('このアカウントは利用許可されていません。');
     }
     $('password').value = '';
     $('loginDialog').close();
+    await loadSlots();
     await refresh();
     notify('ログインしました。');
   } catch (e) { $('loginError').textContent = e.message; }
@@ -270,6 +325,7 @@ $('authBtn').addEventListener('click', async () => {
     saveSession(null);
     isAdmin = false;
     records = [];
+    slots = [];
     updateAuthUI();
     setConnection('offline', 'ログイン待ち');
     notify('ログアウトしました。');
@@ -281,13 +337,28 @@ $('refreshBtn').addEventListener('click', () => refresh());
 $('shareBtn').addEventListener('click', async () => {
   try {
     await navigator.clipboard.writeText(location.href.split('?')[0].split('#')[0]);
-    notify('URLをコピーしました。収支を見るには本人ログインが必要です。');
+    notify('URLをコピーしました。データを見るには共通アカウントでログインが必要です。');
   } catch { notify('URLをコピーできません。ブラウザのアドレス欄からコピーしてください。', true); }
 });
 for (const id of ['periodFilter', 'modeFilter', 'resultFilter']) {
   $(id).addEventListener('change', () => { displayLimit = 30; render(); });
 }
 $('moreBtn').addEventListener('click', () => { displayLimit += 30; render(); });
+$('renameSlot').addEventListener('click', async () => {
+  if (!isAdmin) return;
+  const name = $('slotName').value.trim();
+  if (!name || name.length > 30) { notify('名前は1〜30文字で入力してください。', true); return; }
+  const button = $('renameSlot');
+  button.disabled = true;
+  try {
+    await adminRequest(`/rest/v1/dice_profiles?slot=eq.${selectedSlot}`, {
+      method: 'PATCH', body: { name }, headers: { Prefer: 'return=minimal' }
+    });
+    await loadSlots();
+    notify('名前を保存しました。');
+  } catch (error) { notify(`名前を変更できません。${error.message}`, true); }
+  finally { button.disabled = false; }
+});
 $('playedAt').value = dateInputNow();
 if (!configured) {
   setConnection('offline', '初期設定が必要');
@@ -298,6 +369,9 @@ if (!configured) {
 } else {
   saveSession(loadSession());
   await checkAdmin();
+  if (isAdmin) {
+    try { await loadSlots(); } catch (error) { notify(error.message, true); }
+  }
   await refresh();
   refreshTimer = setInterval(() => { if (!document.hidden) refresh(false); }, 30000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(false); });
