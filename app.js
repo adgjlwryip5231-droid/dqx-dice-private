@@ -10,6 +10,8 @@ let selectedSlot = 1;
 let displayLimit = 30;
 let refreshing = false;
 let refreshTimer = null;
+let slotLoadError = '';
+let slotsReady = false;
 const formatter = new Intl.NumberFormat('ja-JP');
 const money = (n) => formatter.format(n);
 const STORAGE_KEY = 'dqx_dice_session_v1';
@@ -98,7 +100,8 @@ function updateSlotUI() {
     btn.type = 'button';
     btn.className = `slot-button${selectedSlot === i ? ' active' : ''}`;
     btn.textContent = entry?.name || `プレイヤー${i}`;
-    btn.disabled = !isAdmin;
+    btn.disabled = !isAdmin || !slotsReady;
+    btn.title = !isAdmin ? 'ログイン後に選択できます' : !slotsReady ? '10人分の設定を確認してください' : `${btn.textContent}の収支を表示`;
     btn.addEventListener('click', async () => {
       if (selectedSlot === i || !isAdmin) return;
       selectedSlot = i;
@@ -106,18 +109,42 @@ function updateSlotUI() {
       displayLimit = 30;
       updateSlotUI();
       render();
-      await refresh();
+      if (refreshing) {
+        const waitUntilFree = async () => {
+          if (refreshing) { window.setTimeout(waitUntilFree, 100); return; }
+          await refresh();
+        };
+        window.setTimeout(waitUntilFree, 100);
+      } else await refresh();
     });
     root.append(btn);
   }
-  $('slotEdit').classList.toggle('hidden', !isAdmin);
+  $('slotEdit').classList.toggle('hidden', !isAdmin || !slotsReady);
+  const message = $('slotStatus');
+  if (message) {
+    message.textContent = !isAdmin ? 'ログインすると10人分の記録を切り替えられます。' : slotLoadError ? `切り替え設定エラー：${slotLoadError}` : slotsReady ? `現在の選択：${slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`}` : '10人分の設定を確認中…';
+    message.classList.toggle('slot-error', Boolean(slotLoadError));
+  }
   $('slotName').value = slots.find(s => Number(s.slot) === selectedSlot)?.name || `プレイヤー${selectedSlot}`;
 }
 async function loadSlots() {
-  if (!isAdmin) { slots = []; updateSlotUI(); return; }
-  const data = await adminRequest('/rest/v1/dice_profiles?select=slot,name&order=slot.asc');
-  if (!Array.isArray(data) || data.length !== 10) throw new Error('10人分の設定がありません。SQLを実行してください。');
-  slots = data;
+  if (!isAdmin) { slots = []; slotsReady = false; slotLoadError = ''; updateSlotUI(); return; }
+  slotsReady = false;
+  slotLoadError = '';
+  updateSlotUI();
+  try {
+    const data = await adminRequest('/rest/v1/dice_profiles?select=slot,name&order=slot.asc');
+    if (!Array.isArray(data) || data.length !== 10 || Array.from({length:10}, (_,i) => i + 1).some(i => !data.some(s => Number(s.slot) === i))) {
+      throw new Error('10人分のデータがありません。setup_ten_slots.sqlを実行してください。');
+    }
+    slots = data;
+    slotsReady = true;
+    slotLoadError = '';
+  } catch (error) {
+    slots = [];
+    slotLoadError = error.message || '取得に失敗しました。';
+    notify(`10人の切り替えが使えません。${slotLoadError}`, true);
+  }
   updateSlotUI();
 }
 function updateAuthUI() {
@@ -149,7 +176,8 @@ async function refresh(showError = true) {
     if (requestedSlot !== selectedSlot) return;
     records = fetched.records;
     setConnection('online', '非公開データ接続中');
-    if (fetched.truncated) notify('記録が20,000件を超えたため、一部の履歴が集計対象外です。', true);
+    if (slotLoadError) notify(`10人の切り替えが使えません。${slotLoadError}`, true);
+    else if (fetched.truncated) notify('記録が20,000件を超えたため、一部の履歴が集計対象外です。', true);
     else clearNotice();
     $('lastUpdated').textContent = `${new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' })} 更新`;
     render();
@@ -258,16 +286,19 @@ function syncQuickAmountSelection() {
     button.setAttribute('aria-pressed', String(button.dataset.amount === amountField.value));
   }
 }
-for (const button of quickAmountButtons) {
-  button.addEventListener('click', () => {
-    amountField.value = button.dataset.amount;
-    syncQuickAmountSelection();
-  });
-}
+const quickAmountGroup = document.querySelector('.quick-amount-buttons');
+quickAmountGroup?.addEventListener('click', (event) => {
+  const button = event.target.closest('button[data-amount]');
+  if (!button || !quickAmountGroup.contains(button)) return;
+  amountField.value = button.dataset.amount;
+  amountField.dispatchEvent(new Event('input', { bubbles: true }));
+  amountField.focus({ preventScroll: true });
+});
 amountField.addEventListener('input', syncQuickAmountSelection);
 $('entryForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!isAdmin) return;
+  if (!slotsReady) { notify('10人の設定が未完了です。setup_ten_slots.sqlを実行してください。', true); return; }
   const amount = Number($('amount').value);
   const played = new Date($('playedAt').value);
   if (!Number.isSafeInteger(amount) || amount < 1 || amount > 999999999999 || !Number.isFinite(played.getTime())) {
@@ -326,6 +357,8 @@ $('authBtn').addEventListener('click', async () => {
     isAdmin = false;
     records = [];
     slots = [];
+    slotsReady = false;
+    slotLoadError = '';
     updateAuthUI();
     setConnection('offline', 'ログイン待ち');
     notify('ログアウトしました。');
@@ -345,7 +378,7 @@ for (const id of ['periodFilter', 'modeFilter', 'resultFilter']) {
 }
 $('moreBtn').addEventListener('click', () => { displayLimit += 30; render(); });
 $('renameSlot').addEventListener('click', async () => {
-  if (!isAdmin) return;
+  if (!isAdmin || !slotsReady) return;
   const name = $('slotName').value.trim();
   if (!name || name.length > 30) { notify('名前は1〜30文字で入力してください。', true); return; }
   const button = $('renameSlot');
@@ -360,6 +393,7 @@ $('renameSlot').addEventListener('click', async () => {
   finally { button.disabled = false; }
 });
 $('playedAt').value = dateInputNow();
+updateSlotUI();
 if (!configured) {
   setConnection('offline', '初期設定が必要');
   $('history').replaceChildren();
@@ -370,7 +404,7 @@ if (!configured) {
   saveSession(loadSession());
   await checkAdmin();
   if (isAdmin) {
-    try { await loadSlots(); } catch (error) { notify(error.message, true); }
+    await loadSlots();
   }
   await refresh();
   refreshTimer = setInterval(() => { if (!document.hidden) refresh(false); }, 30000);

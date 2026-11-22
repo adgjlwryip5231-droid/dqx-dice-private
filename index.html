@@ -6,9 +6,9 @@
   <meta name="theme-color" content="#0b1220">
   <meta name="description" content="DQXのダイス収支をスマホで記録・非公開で管理するWebアプリ">
   <title>DQX Dice Ledger | Profit Manager</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20261122b">
   <script src="config.js"></script>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=20261122b"></script>
 </head>
 <body>
   <div class="shell">
@@ -26,6 +26,7 @@
       <section class="profile-panel" id="profilesPanel" aria-label="管理対象を切り替える">
         <div class="profile-heading"><div><span class="eyebrow">PLAYER SLOTS</span><h2>管理データを選択</h2></div><span class="muted tiny">共通ログイン・10人分</span></div>
         <div id="slotButtons" class="slot-buttons"></div>
+        <p id="slotStatus" class="slot-status" role="status" aria-live="polite">10人分の切り替えを準備中…</p>
         <div id="slotEdit" class="slot-edit hidden"><label class="field"><span>選択中の名前</span><input id="slotName" maxlength="30" placeholder="名前を入力"></label><button id="renameSlot" type="button" class="subtle-button">名前を保存</button></div>
       </section>
 
